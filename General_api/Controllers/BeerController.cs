@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using General_api.DTOs;
 using Microsoft.EntityFrameworkCore;
+using FluentValidation;
 
 namespace General_api.Controllers
 {
@@ -10,10 +11,14 @@ namespace General_api.Controllers
     public class BeerController : ControllerBase
     {
         private readonly StoreContext _storeContext;
+        private readonly IValidator<BeerInsertDto> _beerInsertValidator;
+        private readonly IValidator<BeerUpdateDto> _beerUpdateValidator;
 
-        public BeerController(StoreContext storeContext)
+        public BeerController(StoreContext storeContext, IValidator<BeerInsertDto> beerInsertValidator, IValidator<BeerUpdateDto> beerUpdateValidator)
         {
             _storeContext = storeContext;
+            _beerInsertValidator = beerInsertValidator;
+            _beerUpdateValidator = beerUpdateValidator;
         }
 
         // Methods
@@ -50,6 +55,14 @@ namespace General_api.Controllers
         [HttpPost]
         public async Task<ActionResult<BeerDto>> Add(BeerInsertDto beerInsertDto)
         {
+            // Validación del objeto beerInsertDto
+            var validadationResult = await _beerInsertValidator.ValidateAsync(beerInsertDto);
+
+            if (!validadationResult.IsValid)
+            {
+                return BadRequest(validadationResult.Errors);
+            }
+
             // Objeto que vamos almacenar en la BD
             var beer = new Beer
             {
@@ -76,6 +89,14 @@ namespace General_api.Controllers
         [HttpPut("{id}")]
         public async Task<ActionResult<BeerDto>> update(int id, BeerUpdateDto beerUpdateDto)
         {
+            // Validation Dto
+            var validationResult = await _beerUpdateValidator.ValidateAsync(beerUpdateDto);
+
+            if (!validationResult.IsValid)
+            {
+                return BadRequest(validationResult.Errors);
+            }
+
             var beer = await _storeContext.Beers.FindAsync(id);
 
             if(beer == null)
@@ -99,6 +120,22 @@ namespace General_api.Controllers
             };
 
             return Ok(beerDto);
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<ActionResult> Delete(int id)
+        {
+            var beer = await _storeContext.Beers.FindAsync(id);
+
+            if(beer == null)
+            {
+                return NotFound();
+            }
+
+            _storeContext.Beers.Remove(beer);
+            await _storeContext.SaveChangesAsync();
+
+            return NoContent();
         }
     }
 }
