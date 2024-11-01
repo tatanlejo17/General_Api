@@ -1,5 +1,6 @@
 using FluentValidation;
 using General_api.DTOs;
+using General_api.Interface;
 using General_api.Models;
 using General_api.Services;
 using General_api.Validators;
@@ -11,6 +12,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddKeyedSingleton<IRandomService, RandomService>("serviceSingleton");
 builder.Services.AddKeyedScoped<IRandomService, RandomService>("serviceScoped");
 builder.Services.AddKeyedTransient<IRandomService, RandomService>("serviceTransient");
+builder.Services.AddKeyedScoped<ICommonService<BeerDto, BeerInsertDto, BeerUpdateDto>, BeerService>("BeerService");
 
 // Add service to JsonPlaceholder
 builder.Services.AddScoped<IPlaceholderService, PlaceholderService>();
