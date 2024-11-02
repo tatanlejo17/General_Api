@@ -27,7 +27,7 @@ namespace General_api.Controllers
         // Methods
         [HttpGet]
         public async Task<IEnumerable<BeerDto>> Get() =>
-            await _beerService.GetAll();
+            await _beerService.Get();
 
         [HttpGet("{id}")]
         public async Task<ActionResult<BeerDto>> GetById(int id)

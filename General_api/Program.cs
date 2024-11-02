@@ -2,6 +2,7 @@ using FluentValidation;
 using General_api.DTOs;
 using General_api.Interface;
 using General_api.Models;
+using General_api.Repository;
 using General_api.Services;
 using General_api.Validators;
 using Microsoft.EntityFrameworkCore;
@@ -30,6 +31,7 @@ builder.Services.AddDbContext<StoreContext>(options =>
 // Inyección de FluentValidator
 builder.Services.AddScoped<IValidator<BeerInsertDto>, BeerInsertValidator>();
 builder.Services.AddScoped<IValidator<BeerUpdateDto>, BeerUpdateValidator>();
+builder.Services.AddScoped<IRepository<Beer>, BeerRepository>();
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
